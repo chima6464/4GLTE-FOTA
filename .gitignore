@@ -1,0 +1,6 @@
+*.d
+*.o
+*.mk
+*.elf
+*.list
+Application/Debug
