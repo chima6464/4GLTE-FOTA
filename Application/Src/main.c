@@ -16,9 +16,21 @@
  ******************************************************************************
  */
 
-#include <stdint.h>
+#include <stdio.h>
 #include "stm32f4xx.h"
-#include "stm32f411xe.h"
+#include "fpu.h"
+#include "uart.h"
+#include "timebase.h"
+#include "bsp.h"
+#include "adc.h"
+#include "circular_buffer.h"
+
+#define GPIOAEN (1U << 0)
+#define PIN5 (1U << 5)
+#define LED_PIN PIN5
+
+static bool btn_state;
+static uint32_t sensor_value;
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
 #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -26,7 +38,37 @@
 
 int main(void)
 {
-  /* Loop forever */
-  for (;;)
-    ;
+  /*Enable FPU*/
+  fpu_enable();
+
+  /*Initialize debug UART*/
+  debug_uart_init();
+  slave_dev_uart_init();
+
+  /*Initialize timebase*/
+  timebase_init();
+
+  /*Initialize LED*/
+  led_init();
+
+  /*Initialize Push button*/
+  button_init();
+
+  /*Initialize ADC*/
+  pa1_adc_init();
+
+  circular_buffer_init();
+  /*Start conversion*/
+  // start_conversion();
+
+  while (1)
+  {
+
+    // printf("Slave Dev UART...\n\r");
+
+    buffer_send_string("Hello DEBUG\n\r", DEBUG_PORT);
+    buffer_send_string("Hello SLAVE DEV\n\r", SLAVE_DEV_PORT);
+
+    delay(1);
+  }
 }
